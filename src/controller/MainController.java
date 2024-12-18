@@ -20,7 +20,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
@@ -166,11 +171,11 @@ public class MainController implements Initializable {
         initializeDatabase();
         setupTableColumns();
         setupFilterComboBox();
-        setupYearFilterComboBox();  // Инициализация фильтра по году
+        setupYearFilterComboBox();
         setupSearchField();
         refreshData();
 
-        // Настройка элементов экспорта
+
         setupExportFormatComboBox();
 
         TableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
@@ -316,8 +321,8 @@ public class MainController implements Initializable {
             try {
                 int year = Integer.parseInt(selectedYear);
                 filteredData.removeIf(book -> book.getYear() != year);
-            } catch (NumberFormatException e) {
-                // Игнорировать некорректные значения
+            } catch (NumberFormatException ignored) {
+
             }
         }
 
@@ -413,9 +418,7 @@ public class MainController implements Initializable {
         alert.showAndWait();
     }
 
-    /**
-     * Метод для обработки экспорта данных.
-     */
+
     @FXML
     private void handleExport() {
         String selectedFormat = exportFormatComboBox.getValue();
@@ -424,7 +427,7 @@ public class MainController implements Initializable {
             return;
         }
 
-        // В текущем случае поддерживается только CSV
+
         if (selectedFormat.equalsIgnoreCase("CSV")) {
             exportToCSV();
         } else {
@@ -432,18 +435,12 @@ public class MainController implements Initializable {
         }
     }
 
-    /**
-     * Метод для экспорта данных в CSV файл.
-     */
+
     private void exportToCSV() {
-        // Используем FileChooser для выбора места сохранения файла
         javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
         fileChooser.setTitle("Сохранить как");
-        // Устанавливаем расширение файла по умолчанию
         fileChooser.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("CSV Files", "*.csv"));
-        // Устанавливаем начальное имя файла
         fileChooser.setInitialFileName("books_export.csv");
-        // Открываем диалог сохранения файла
         File file = fileChooser.showSaveDialog(TableView.getScene().getWindow());
 
         if (file != null) {
