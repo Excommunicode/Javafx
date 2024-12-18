@@ -1,6 +1,5 @@
 package controller;
 
-import library.Books;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -10,24 +9,21 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import library.Books;
 
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
-
 import java.util.ResourceBundle;
-
-
-
 
 
 public class MainController implements Initializable {
 
     @FXML
     private TextField idField;
-    
+
     @FXML
     private TextField titleField;
 
@@ -51,10 +47,10 @@ public class MainController implements Initializable {
 
     @FXML
     private TableView<Books> TableView;
-    
+
     @FXML
     private TableColumn<Books, Integer> idColumn;
-    
+
     @FXML
     private TableColumn<Books, String> titleColumn;
 
@@ -69,85 +65,85 @@ public class MainController implements Initializable {
 
     @FXML
     private void insertButton() {
-    	String query = "insert into books values("+idField.getText()+",'"+titleField.getText()+"','"+authorField.getText()+"',"+yearField.getText()+","+pagesField.getText()+")";
-    	executeQuery(query);
-    	showBooks();
+        String query = "insert into books values(" + idField.getText() + ",'" + titleField.getText() + "','" + authorField.getText() + "'," + yearField.getText() + "," + pagesField.getText() + ")";
+        executeQuery(query);
+        showBooks();
     }
-    
-    
-    @FXML 
+
+
+    @FXML
     private void updateButton() {
-    String query = "UPDATE books SET Title='"+titleField.getText()+"',Author='"+authorField.getText()+"',Year="+yearField.getText()+",Pages="+pagesField.getText()+" WHERE ID="+idField.getText()+"";
-    executeQuery(query);
-	showBooks();
+        String query = "UPDATE books SET Title='" + titleField.getText() + "',Author='" + authorField.getText() + "',Year=" + yearField.getText() + ",Pages=" + pagesField.getText() + " WHERE ID=" + idField.getText() + "";
+        executeQuery(query);
+        showBooks();
     }
-    
+
     @FXML
     private void deleteButton() {
-    	String query = "DELETE FROM books WHERE ID="+idField.getText()+"";
-    	executeQuery(query);
-    	showBooks();
+        String query = "DELETE FROM books WHERE ID=" + idField.getText() + "";
+        executeQuery(query);
+        showBooks();
     }
-    
+
     public void executeQuery(String query) {
-    	Connection conn = getConnection();
-    	Statement st;
-    	try {
-			st = conn.createStatement();
-			st.executeUpdate(query);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+        Connection conn = getConnection();
+        Statement st;
+        try {
+            st = conn.createStatement();
+            st.executeUpdate(query);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-    	showBooks();
+        showBooks();
     }
-    
+
     public Connection getConnection() {
-    	Connection conn;
-    	try {
-    		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/library","root","admin");
-    		return conn;
-    	}
-    	catch (Exception e){
-    		e.printStackTrace();
-    		return null;
-    	}
+        Connection conn;
+        try {
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/library", "root", "Yeldos210406");
+            return conn;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
-    
-    public ObservableList<Books> getBooksList(){
-    	ObservableList<Books> booksList = FXCollections.observableArrayList();
-    	Connection connection = getConnection();
-    	String query = "SELECT * FROM books ";
-    	Statement st;
-    	ResultSet rs;
-    	
-    	try {
-			st = connection.createStatement();
-			rs = st.executeQuery(query);
-			Books books;
-			while(rs.next()) {
-				books = new Books(rs.getInt("Id"),rs.getString("Title"),rs.getString("Author"),rs.getInt("Year"),rs.getInt("Pages"));
-				booksList.add(books);
-				}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-    	return booksList;
+
+    public ObservableList<Books> getBooksList() {
+        ObservableList<Books> booksList = FXCollections.observableArrayList();
+        Connection connection = getConnection();
+        String query = "SELECT * FROM books ";
+        Statement st;
+        ResultSet rs;
+
+        try {
+            st = connection.createStatement();
+            rs = st.executeQuery(query);
+            Books books;
+            while (rs.next()) {
+                books = new Books(rs.getInt("Id"), rs.getString("Title"), rs.getString("Author"), rs.getInt("Year"), rs.getInt("Pages"));
+                booksList.add(books);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return booksList;
     }
-    
+
     // I had to change ArrayList to ObservableList I didn't find another option to do this but this works :)
     public void showBooks() {
-    	ObservableList<Books> list = getBooksList();
-    	
-    	idColumn.setCellValueFactory(new PropertyValueFactory<Books,Integer>("id"));
-    	titleColumn.setCellValueFactory(new PropertyValueFactory<Books,String>("title"));
-    	authorColumn.setCellValueFactory(new PropertyValueFactory<Books,String>("author"));
-    	yearColumn.setCellValueFactory(new PropertyValueFactory<Books,Integer>("year"));
-    	pagesColumn.setCellValueFactory(new PropertyValueFactory<Books,Integer>("pages"));
-    	
-    	TableView.setItems(list);
+        ObservableList<Books> list = getBooksList();
+
+        idColumn.setCellValueFactory(new PropertyValueFactory<Books, Integer>("id"));
+        titleColumn.setCellValueFactory(new PropertyValueFactory<Books, String>("title"));
+        authorColumn.setCellValueFactory(new PropertyValueFactory<Books, String>("author"));
+        yearColumn.setCellValueFactory(new PropertyValueFactory<Books, Integer>("year"));
+        pagesColumn.setCellValueFactory(new PropertyValueFactory<Books, Integer>("pages"));
+
+        TableView.setItems(list);
     }
 
 }
